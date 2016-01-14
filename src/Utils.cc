@@ -256,41 +256,37 @@ void Utils::computeCosAlpha (double Vx,
 }
 
 #if ROOFIT
+using namespace RooFit;
 RooHistPdf* Utils::ReadRTEffPDF (unsigned int q2BinIndx,RooRealVar* z, RooRealVar* y,RooRealVar* p)
 {
+ //using namespace RooFit;
   RooHistPdf* EffPDF =NULL;
 
  //#######################
   //# read eff parameters #
   //#######################
   
-  TFile* file=TFile::Open("/afs/cern.ch/user/l/llinwei/work/B0KstMuMu/efficiency/effKEpdf_out_RT.root","READ");
+  TFile* file=TFile::Open("/afs/cern.ch/user/l/llinwei/work2/B0KstMuMu/efficiency/effKEpdf_out_RT.root","READ");
   std::cout <<"[Utils::GetRTEffPdf]\t: " <<" effKEpdf_out_RT.root" << std::endl; 
   TString pdfName=Form("pdf_ctKctLphi_q2bin%d",q2BinIndx+1);
   RooHistPdf*  EffPDFm =(RooHistPdf*)file->Get(pdfName);
   std::cout << "\n[ExtractYield::ReadRTEffPDF] \t@@@ Reading EFF parameters fit signal" <<  std::endl;  
-//  TH3* h3 = (TH3*) EffPDFm ->createHistogram("ctK,ctL,phi");
- // RooDataHist* Eff = new RooDataHist("Eff","Eff",RooArgList(*z,*y,*p),h3);
-   EffPDF = new RooHistPdf("EffPDF","EffPDF",RooArgSet(*z,*y,*p),EffPDFm->dataHist());
+  EffPDF = new RooHistPdf("EffPDF","EffPDF",RooArgSet(*z,*y,*p),EffPDFm->dataHist(),1);
+
   return EffPDF;
 }
 
 RooHistPdf* Utils::ReadWTEffPDF (unsigned int q2BinIndx,RooRealVar* z, RooRealVar* y,RooRealVar* p)
 {
-  RooHistPdf* EffPDF =NULL;
+   RooHistPdf* EffPDF =NULL;
 
   //# read eff parameters #
   //#######################
-   TFile* file=TFile::Open("/afs/cern.ch/user/l/llinwei/work/B0KstMuMu/efficiency/effKEpdf_out_WT.root","READ");
-   TString pdfName=Form("pdf_ctKctLphi_q2bin%d",q2BinIndx+1);
+  TFile* file=TFile::Open("/afs/cern.ch/user/l/llinwei/work2/B0KstMuMu/efficiency/effKEpdf_out_fine_WT.root","READ");
+  TString pdfName=Form("pdf_ctKctLphi_q2bin%d",q2BinIndx+1);
   RooHistPdf* EffPDFm =(RooHistPdf*)file->Get(pdfName);
-   std::cout << "\n[ExtractYield::ReadWTEffPDF] \t@@@ Reading EFF parameters fit signal" << std::endl;
-//   TH3* histo =(TH3*) EffPDFm ->createHistogram("ctK,ctL,phi");
- // RooDataHist* Eff = new RooDataHist("Eff","Eff",RooArgList(*z,*y,*p),h3);
-   EffPDF = new RooHistPdf("EffPDF","EffPDF",RooArgSet(*z,*y,*p),EffPDFm->dataHist());
-
-  // RooArgSet* params = EffPDF ->getVariables();
-  // params->setRealValue("ctK",0);
+  std::cout << "\n[ExtractYield::ReadWTEffPDF] \t@@@ Reading EFF parameters fit signal" << std::endl;
+  EffPDF = new RooHistPdf("EffPDF","EffPDF",RooArgSet(*z,*y,*p),EffPDFm->dataHist(),1);
   return EffPDF;
 }
 
@@ -2115,6 +2111,7 @@ std::string Utils::GetGenericParam (std::string parName)
   else if (parName == "SIGMAS1")             return GenericPars[15];
   else if (parName == "SIGMAS2")             return GenericPars[16];
   else if (parName == "FRACMASSS")           return GenericPars[17];
+  else if (parName == "UseSPwave")           return GenericPars[18];
   else
     {
       std::cout << "[Utils::GetGenericParam]\tGeneric parameter not valid : " << parName << std::endl;
