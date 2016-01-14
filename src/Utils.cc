@@ -282,7 +282,7 @@ RooHistPdf* Utils::ReadWTEffPDF (unsigned int q2BinIndx,RooRealVar* z, RooRealVa
 
   //# read eff parameters #
   //#######################
-  TFile* file=TFile::Open("/afs/cern.ch/user/l/llinwei/work2/B0KstMuMu/efficiency/effKEpdf_out_fine_WT.root","READ");
+  TFile* file=TFile::Open("/afs/cern.ch/user/l/llinwei/work2/B0KstMuMu/efficiency/effKEpdf_out_WT.root","READ");
   TString pdfName=Form("pdf_ctKctLphi_q2bin%d",q2BinIndx+1);
   RooHistPdf* EffPDFm =(RooHistPdf*)file->Get(pdfName);
   std::cout << "\n[ExtractYield::ReadWTEffPDF] \t@@@ Reading EFF parameters fit signal" << std::endl;
