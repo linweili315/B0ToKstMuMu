@@ -623,11 +623,11 @@ HLT_DoubleMu3p5_LowMass_Displaced_v
 0.0
 ###################################################################
 # FL +/- err
-0.947201
+0.980437
 # P5p +/- err
--0.231657
+-0.37043
 # P1 +/- err
--0.0300528
+0.661625
 # P2 +/- err
 0.0
 # FS +/- err
@@ -777,11 +777,11 @@ HLT_DoubleMu3p5_LowMass_Displaced_v
 0.0
 ###################################################################
 # FL +/- err
-0.713885
+0.49861
 # P5p +/- err
--0.0995762
+-0.560628
 # P1 +/- err
-0.398534
+-0.635431
 # P2 +/- err
 0.0
 # FS +/- err
@@ -931,11 +931,12 @@ HLT_DoubleMu3p5_LowMass_Displaced_v
 0.0
 ###################################################################
 # FL +/- err
-0.221668
+0.999742
 # P5p +/- err
--0.21319
+-0.16291
 # P1 +/- err
--0.93933
+-0.434764
+#-3.0228e-01   -4.99e-08    4.99e-08
 # P2 +/- err
 0.0
 # FS +/- err
@@ -1237,11 +1238,11 @@ HLT_DoubleMu3p5_LowMass_Displaced_v
 0.0
 ###################################################################
 # FL +/- err
-0.947201
+0.957477
 # P5p +/- err
--0.231657
-# P1 +/- err
--0.0300528
+-0.744305
+# P1 +/-err
+0.0800873
 # P2 +/- err
 0.0
 # FS +/- err
@@ -1543,11 +1544,11 @@ HLT_DoubleMu3p5_LowMass_Displaced_v
 0.0
 ###################################################################
 # FL +/- err
-0.599796
+0.315638
 # P5p +/- err
--0.644575
+-0.804403
 # P1 +/- err
--0.134748
+0.0393442
 # P2 +/- err
 0.0
 # FS +/- err
@@ -1697,11 +1698,11 @@ HLT_DoubleMu3p5_LowMass_Displaced_v
 0.0
 ###################################################################
 # FL +/- err
-0.431845
+0.957477
 # P5p+/- err
--0.140733
+-0.744305
 # P1 +/- err
--0.199216
+0.0800873
 # P2 +/- err
 0.0
 # FS +/- err
@@ -1851,8 +1852,8 @@ HLT_DoubleMu3p5_LowMass_Displaced_v
 # trueGoodtag = keep only true good-tagged events
 # trueAll     = keep all true events
 # allEvts     = keep all events
-trueAll
-#trueGoodtag
+#trueAll
+trueGoodtag
 #trueMistag
 # Control mistag fraction workflow [0 = fixed; 1 = free with constraint; 2 = free; 3 = dynamic]
 3

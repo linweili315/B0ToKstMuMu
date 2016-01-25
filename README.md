@@ -17,10 +17,12 @@ For example:
 TFile* file=TFile::Open("/afs/cern.ch/user/l/llinwei/work/B0KstMuMu/efficiency/effKEpdf_out_RT.root","READ");
 just change this to your efficiency's directory.
 
-(c) You can now compile the fitter program:
+(c) You need to choose type you want to fit, then copy “B0KstMuMu/result/name.txt" to and change name, "B0KstMuMu/python/ParameterFile.txt"
+
+(d) You can now compile the fitter program:
 make ExtractYield
 
-(d) Every program that I wrote as a synopsis if you call it without
+(e) Every program that I wrote as a synopsis if you call it without
 any argument.
 Anyway, to run the fit you can for example type:
 
