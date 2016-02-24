@@ -409,7 +409,7 @@ bool CheckGoodFit (RooFitResult* fitResult, TPaveText* paveText)
 {
   if (fitResult != NULL)
     {
-      if ((fitResult->covQual() == 3) && (fitResult->status() == 0) &&(fitResult->edm() <0.0001))
+      if ((fitResult->covQual() == 3) && (fitResult->status() == 0))
 	{
 	  if (paveText != NULL) paveText->AddText("Fit status: GOOD");
 	  return true;
@@ -1081,12 +1081,13 @@ unsigned int CopyFitResults (RooAbsPdf* pdf, unsigned int q2BinIndx, vector<vect
                       
   if (GetVar(pdf,"nMisTagFrac") != NULL)
     {
-      if (atoi(Utility->GetGenericParam("CtrlMisTagWrkFlow").c_str()) != 3 ||(countMisTag==0 && countGoodTag==0))
+      if (atoi(Utility->GetGenericParam("CtrlMisTagWrkFlow").c_str()) != 3 )
 	{
 	  myString.clear(); myString.str("");
 	  myString << fitParam->operator[](Utility->GetFitParamIndx("nMisTagFrac"))->operator[](q2BinIndx).c_str();
 	  SetValueAndErrors(pdf,"nMisTagFrac",1.0,&myString,&value,&errLo,&errHi);
-          GetVar(pdf,"nMisTagFrac")->setConstant(false); 
+         if ((atoi(Utility->GetGenericParam("CtrlMisTagWrkFlow").c_str()) == 0) || ((errLo == 0.0) && (errHi == 0.0))) GetVar(pdf,"nMisTagFrac")->setConstant(true);
+	  else                                                                                                          GetVar(pdf,"nMisTagFrac")->setConstant(false);
          }
       else
 	{
@@ -1208,7 +1209,7 @@ unsigned int CopyFitResults (RooAbsPdf* pdf, unsigned int q2BinIndx, vector<vect
       myString << fitParam->operator[](Utility->GetFitParamIndx("FlS"))->operator[](q2BinIndx).c_str();
 //      myString <<  RooRandom::uniform();
       SetValueAndErrors(pdf,"FlS",1.0,&myString,&value,&errLo,&errHi);
-      GetVar(pdf,"FlS")->setConstant(false);
+      GetVar(pdf,"FlS")->setConstant(true);
 //      fileFitResults << "Fl="<<myString.str() << endl;
      }
   if (GetVar(pdf,"P5pS") != NULL)
@@ -1225,7 +1226,8 @@ unsigned int CopyFitResults (RooAbsPdf* pdf, unsigned int q2BinIndx, vector<vect
       GetVar(pdf,"P5pS")->setConstant(false);
       cout<<"P5p="<<myString.str()<<endl;
       fileFitResults << "P5p="<<myString.str() << endl;
-   */ }
+*/
+   }
   if (GetVar(pdf,"P1S") != NULL)
     {
       myString.clear(); myString.str("");
@@ -1247,14 +1249,14 @@ unsigned int CopyFitResults (RooAbsPdf* pdf, unsigned int q2BinIndx, vector<vect
       myString.clear(); myString.str("");
       myString << fitParam->operator[](Utility->GetFitParamIndx("FsS"))->operator[](q2BinIndx);
       SetValueAndErrors(pdf,"FsS",1.0,&myString,&value,&errLo,&errHi);
-      GetVar(pdf,"FsS")->setConstant(false);
+      GetVar(pdf,"FsS")->setConstant(true);
     }
   if (GetVar(pdf,"AsS") != NULL)
     {
       myString.clear(); myString.str("");
       myString << fitParam->operator[](Utility->GetFitParamIndx("AsS"))->operator[](q2BinIndx);
       SetValueAndErrors(pdf,"AsS",1.0,&myString,&value,&errLo,&errHi);
-      GetVar(pdf,"AsS")->setConstant(false);
+      GetVar(pdf,"AsS")->setConstant(true);
     }
  if (GetVar(pdf,"As5S") != NULL)
     {
@@ -2167,8 +2169,8 @@ RooFitResult* MakeMass3AnglesFit (RooDataSet* dataSet, RooAbsPdf** TotalPDF, Roo
       // # Make actual fit #
       // ###################
   
-     if (atoi(Utility->GetGenericParam("ApplyConstr").c_str()) == true) fitResult = (*TotalPDF)->fitTo(*dataSet,ExternalConstraints(*vecConstr),Save(true),Minos(atoi(Utility->GetGenericParam("UseMINOS").c_str())),Minimizer(MINIMIZER),NumCPU(8));
-      else                                                               fitResult = (*TotalPDF)->fitTo(*dataSet,Save(true),Minos(atoi(Utility->GetGenericParam("UseMINOS").c_str())),Minimizer(MINIMIZER),NumCPU(8));
+       if (atoi(Utility->GetGenericParam("ApplyConstr").c_str()) == true) fitResult = (*TotalPDF)->fitTo(*dataSet,ExternalConstraints(*vecConstr),Save(true),Minos(atoi(Utility->GetGenericParam("UseMINOS").c_str())),Minimizer(MINIMIZER),NumCPU(8));
+      else                                                               fitResult = (*TotalPDF)->fitTo(*dataSet,Save(true),Minos(atoi(Utility->GetGenericParam("UseMINOS").c_str())),Minimizer(MINIMIZER),Extended(0),NumCPU(8));
 
 
       // ###################################################
@@ -2183,7 +2185,7 @@ RooFitResult* MakeMass3AnglesFit (RooDataSet* dataSet, RooAbsPdf** TotalPDF, Roo
       // #####################
       // # Mass plot results #
       // #####################
-  if (PLOT==true)
+  if (PLOT==true && CheckGoodFit(fitResult) == true)
    {
       TCanvas* Canv = new TCanvas("Canv","Canv",1200,900);
       Canv->Divide(2,2);
@@ -2529,11 +2531,15 @@ void IterativeMass3AnglesFitq2Bins (RooDataSet* dataSet,
      // # scan values #
      //################
      for (int scan = 0; scan < 200; scan++)
-     {   
+     {
+        CopyFitResults(TotalPDFq2Bins[i],i,fitParam,countMisTag,countGoodTag);
+       if(scan<6) continue;
+       else
+       {
       // #####################
       // # Initialize p.d.f. #
       // #####################
-      CopyFitResults(TotalPDFq2Bins[i],i,fitParam,countMisTag,countGoodTag);
+    //  CopyFitResults(TotalPDFq2Bins[i],i,fitParam,countMisTag,countGoodTag);
 
       // #####################
       // # Apply constraints #
@@ -2548,13 +2554,17 @@ void IterativeMass3AnglesFitq2Bins (RooDataSet* dataSet,
       // # Perform the fit #
       // ##################
       cout << "I am scanning the fitting values"<<endl;
+      cout << "scan = " << scan << endl;
+      fileFitResults << "scan = " << scan << endl;    
       fitResult = MakeMass3AnglesFit(dataSet_q2Bins[i],&TotalPDFq2Bins[i],x,y,z,p,FitType,vecConstr,extText[i],ID);
       double nll= fitResult->minNll();
       cout << "nll=" <<nll <<endl;
       fileFitResults << "nll=" << nll << endl;
-      if (CheckGoodFit(fitResult) == true) 
+      if (CheckGoodFit(fitResult) == true)  
          {
          cout << "\n[ExtractYield::IterativeMass3AnglesFitq2Bins]\t@@@ Fit converged ! @@@" << endl;
+   //      cout << "scan = " << scan << endl;
+   //      fileFitResults << "scan = " << scan << endl;
          fileFitResults << "Fit converged " << endl;
          }
       else    
@@ -2562,6 +2572,7 @@ void IterativeMass3AnglesFitq2Bins (RooDataSet* dataSet,
          cout << "\n[ExtractYield::IterativeMass3AnglesFitq2Bins]\t@@@ Fit didn't converge ! @@@" << endl;
          fileFitResults << "Fit didn't converge " << endl;
          }
+        }
       }
      }
      //###########
