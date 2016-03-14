@@ -27,3 +27,9 @@ any argument.
 Anyway, to run the fit you can for example type:
 
 ./ExtractYield 6 singleCand_B0ToKstMuMu_MC_NTuple.root yesEffCorr 0
+
+(f) If you want to do cocktail MC fitting, you can use the example type:
+
+./ExtractYield 21 toyFullDatasets.root yesEffCorr 0 0
+
+(the first 0 is the bin number, and the second 0 is toy ID)
