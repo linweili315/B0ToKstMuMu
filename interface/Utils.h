@@ -92,7 +92,11 @@ class Utils
                          double Py2,
                          double Pz2,
                          double mass2);
-  
+
+  void  ComputeGenAngles(double &cosThetaKGen, 
+                         double &cosThetaMuGen, 
+                         double &phiKstMuMuPlaneGen);
+
   double computeEta (double Px,
                      double Py,
                      double Pz);

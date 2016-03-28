@@ -953,7 +953,7 @@ HLT_DoubleMu3p5_LowMass_Displaced_v
 # Use peaking bkg: 0 = no; 1 = 1 gaussian; 2 = 2 gaussians; 11 = two 1 gaussian; 12 = two 2 gaussians
 0
 # Use combinatorial bkg: 0 = no; 1 = 1 exponential; 2 = 2 exponentials; 3 = erfc
-1
+0
 # Use mistag: 0 = no; 1 = 1 gaussian; 2 = 2 gaussians
 2
 
@@ -1847,7 +1847,7 @@ HLT_DoubleMu3p5_LowMass_Displaced_v
 # Number of generic parameters
 19
 # Use MINOS for error computation [0 = no; 1 = yes]
-1
+0
 # Apply constraints in the likelihood [0 = no; 1 = yes]
 0
 # Control fit workflow:
@@ -1903,7 +1903,7 @@ allEvts
 0.858331
 
 # Use SP-wave [0 = no; 1 = yes]
-1
+0
 
 ############################
 # 16nd block of parameters #
@@ -1922,4 +1922,4 @@ allEvts
 0
 
 # [0 = data; 1 = MC B0-->K*mumu; 3 = MC B0-->K*J/psi; 5 = MC B0-->K*psi(2S)]
-0
+1

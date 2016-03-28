@@ -266,7 +266,7 @@ RooHistPdf* Utils::ReadRTEffPDF (unsigned int q2BinIndx,RooRealVar* z, RooRealVa
   //# read eff parameters #
   //#######################
   
-  TFile* file=TFile::Open("/afs/cern.ch/user/w/wguo/work/B0KstMuMu/efficiency/effKEpdf_out_RT.root","READ");
+  TFile* file=TFile::Open("/afs/cern.ch/user/w/wguo/work/B0KstMuMu3/efficiency/effKEpdf_out_RT.root","READ");
   std::cout <<"[Utils::GetRTEffPdf]\t: " <<" effKEpdf_out_RT.root" << std::endl; 
   TString pdfName=Form("pdf_ctKctLphi_q2bin%d",q2BinIndx+1);
   RooHistPdf*  EffPDFm =(RooHistPdf*)file->Get(pdfName);
@@ -281,7 +281,7 @@ RooHistPdf* Utils::ReadWTEffPDF (unsigned int q2BinIndx,RooRealVar* z, RooRealVa
    RooHistPdf* EffPDF =NULL;
   //# read eff parameters #
   //#######################
-  TFile* file=TFile::Open("/afs/cern.ch/user/w/wguo/work/B0KstMuMu/efficiency/effKEpdf_out_WT_CTKInv.root","READ");
+  TFile* file=TFile::Open("/afs/cern.ch/user/w/wguo/work/B0KstMuMu3/efficiency/effKEpdf_out_WT_CTKInv.root","READ");
   TString pdfName=Form("pdf_ctKctLphi_q2bin%d",q2BinIndx+1);
   RooHistPdf* EffPDFm =(RooHistPdf*)file->Get(pdfName);
   std::cout << "\n[ExtractYield::ReadWTEffPDF] \t@@@ Reading EFF parameters fit signal" << std::endl;
