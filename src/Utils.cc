@@ -43,7 +43,7 @@ Utils::Utils (bool rightFlavorTag)
   B0MassErr    = 1.7e-4;
   kstSigma     = 0.05;
 
-  nFitParam    = 67;
+  nFitParam    = 68;
   nConfigParam = 4;
   nFitObserv   = 3; // FL --- P5p --- P1 --- P2 --- BF
 
@@ -266,8 +266,8 @@ RooHistPdf* Utils::ReadRTEffPDF (unsigned int q2BinIndx,RooRealVar* z, RooRealVa
   //# read eff parameters #
   //#######################
   
-  TFile* file=TFile::Open("/afs/cern.ch/user/w/wguo/work/B0KstMuMu3/efficiency/effKEpdf_out_RT.root","READ");
-  std::cout <<"[Utils::GetRTEffPdf]\t: " <<" effKEpdf_out_RT.root" << std::endl; 
+  TFile* file=TFile::Open("/afs/cern.ch/user/w/wguo/work/B0KstMuMu/efficiency/effKEpdf_out_RT.root","READ");
+  std::cout <<"[Utils::GetRTEffPdf]\t: " <<"effKEpdf_out_RT.root" << std::endl; 
   TString pdfName=Form("pdf_ctKctLphi_q2bin%d",q2BinIndx+1);
   RooHistPdf*  EffPDFm =(RooHistPdf*)file->Get(pdfName);
   std::cout << "\n[ExtractYield::ReadRTEffPDF] \t@@@ Reading EFF parameters fit signal" <<  std::endl;  
@@ -281,7 +281,7 @@ RooHistPdf* Utils::ReadWTEffPDF (unsigned int q2BinIndx,RooRealVar* z, RooRealVa
    RooHistPdf* EffPDF =NULL;
   //# read eff parameters #
   //#######################
-  TFile* file=TFile::Open("/afs/cern.ch/user/w/wguo/work/B0KstMuMu3/efficiency/effKEpdf_out_WT_CTKInv.root","READ");
+  TFile* file=TFile::Open("/afs/cern.ch/user/w/wguo/work/B0KstMuMu/efficiency/effKEpdf_out_WT_CTKInv.root","READ");
   TString pdfName=Form("pdf_ctKctLphi_q2bin%d",q2BinIndx+1);
   RooHistPdf* EffPDFm =(RooHistPdf*)file->Get(pdfName);
   std::cout << "\n[ExtractYield::ReadWTEffPDF] \t@@@ Reading EFF parameters fit signal" << std::endl;
@@ -1550,6 +1550,7 @@ unsigned int Utils::GetFitParamIndx (std::string varName)
   else if (varName == "FsS")            return 64;
   else if (varName == "AsS")            return 65;
   else if (varName == "As5S")           return 66;
+  else if (varName == "nBkgComb")           return 67;
 
   std::cout << "[Utils::GetFitParamIndx]\tError wrong index name : " << varName << std::endl;
   exit (EXIT_FAILURE);
@@ -2135,3 +2136,161 @@ double* Utils::MakeBinning (std::vector<double>* STLvec)
   return vec;
 }
 
+
+#if ROOFIT
+std::string Utils::Transformer (std::string varName, bool doIt, double& varValOut, double& varValOutELo, double& varValOutEHi, RooFitResult* fitResult, RooRealVar* varValIn1, RooRealVar* varValIn2, RooRealVar* varValIn3, RooRealVar* varValIn4)
+// #######################
+// # varValIn1 = Fl, Fs  #
+// # varValIn2 = Afb, Fs #
+// # varValIn3 = As      #
+// #######################
+{
+  double theorCoeff = 0.89; // @TMP@ : to be reviewed
+  const TMatrixTSym<double>* CovM = (fitResult != NULL ? &fitResult->covarianceMatrix() : NULL);
+  double val1,val2,val1ELo,val1EHi,val2ELo,val2EHi;
+  std::string sVal1,sVal2;
+  std::stringstream myString;
+  myString.clear(); myString.str("");
+
+
+  if (varValIn1 == NULL)
+    {
+      if (varName == "FlS")
+	{
+	  if (doIt == true) myString << "(1/2 + TMath::ATan(" << varName << ")/TMath::Pi())";
+	  else              myString << "(" << varName << ")";
+	  std::cout << "[Utils::Transformer]\tTransformer function: " << myString.str().c_str() << std::endl;
+	  return myString.str();
+	}
+      else if (varName == "AfbS")
+	{
+	  sVal1 = Transformer("FlS",doIt,val1,val1ELo,val1EHi);
+
+	  if (doIt == true) myString << "(3/4*(1 - " << sVal1 << ") * 2*TMath::ATan(" << varName << ")/TMath::Pi())";
+	  else              myString << "(" << varName << ")";
+	  std::cout << "[Utils::Transformer]\tTransformer function: " << myString.str().c_str() << std::endl;
+	  return myString.str();
+	}
+      else if (varName == "FsS")
+	{
+	  myString << "(" << varName << ")";
+	  std::cout << "[Utils::Transformer]\tTransformer function: " << myString.str().c_str() << std::endl;
+	  return myString.str();
+	}
+      else if (varName == "AsS")
+	{
+	  sVal1 = Transformer("FlS",doIt,val1,val1ELo,val1EHi);
+	  sVal2 = Transformer("FsS",doIt,val2,val2ELo,val2EHi);
+
+	  myString << "(" << varName << "*2*" << theorCoeff << "*sqrt(3*" << sVal2 << "*(1-" << sVal2 << ")*" << sVal1 << "))";
+	  std::cout << "[Utils::Transformer]\tTransformer function: " << myString.str().c_str() << std::endl;
+	  return myString.str();
+	}
+      else if (varName == "As5S")
+	{
+	  sVal1 = Transformer("FlS",doIt,val1,val1ELo,val1EHi);
+          sVal2 = Transformer("FsS",doIt,val2,val2ELo,val2EHi);
+
+	  myString << "(" << varName << "*" << theorCoeff << "*sqrt(3*" << sVal2 << "*(1-" << sVal2 << ")*(1-" << sVal1 << ")*(1+P1S)))";
+	  std::cout << "[Utils::Transformer]\tTransformer function: " << myString.str().c_str() << std::endl;
+	  return myString.str();
+	}
+      else
+	{
+	  std::cout << "[Utils::Transformer]\tWrong parameter: " << varName << std::endl;
+	  exit (EXIT_FAILURE);
+	}
+    }
+  else if ((varName == "FlS") && (varValIn1 != NULL))
+    {
+      varValOut    = 1./2. + TMath::ATan(varValIn1->getVal()) / TMath::Pi();
+
+      varValOutELo = 1./2. + TMath::ATan(varValIn1->getVal() + varValIn1->getErrorLo()) / TMath::Pi() - varValOut;
+      varValOutEHi = 1./2. + TMath::ATan(varValIn1->getVal() + varValIn1->getErrorHi()) / TMath::Pi() - varValOut;
+
+      if (doIt == false)
+	{
+	  varValOut    = varValIn1->getVal();
+	  varValOutELo = varValIn1->getErrorLo();
+	  varValOutEHi = varValIn1->getErrorHi();
+	}
+    }
+  else if ((varName == "AfbS") && (varValIn1 != NULL) && (varValIn2 != NULL))
+    {
+      Transformer("FlS",doIt,val1,val1ELo,val1EHi,fitResult,varValIn1);
+      val2 = 3./4. * (1. - val1);
+
+      varValOut    = val2 * 2.*TMath::ATan(varValIn2->getVal()) / TMath::Pi();
+
+      varValOutELo = val2 * 2.*TMath::ATan(varValIn2->getVal() + varValIn2->getErrorLo()) / TMath::Pi() - varValOut;
+      varValOutEHi = val2 * 2.*TMath::ATan(varValIn2->getVal() + varValIn2->getErrorHi()) / TMath::Pi() - varValOut;
+
+      varValOutELo = - sqrt( pow(3./4. * 2.*TMath::ATan(varValIn2->getVal()) / TMath::Pi() * val1ELo,2.) + pow(varValOutELo,2.) +
+
+      			     (varValIn1->getErrorLo() != 0.0 && varValIn2->getErrorLo() != 0.0 ?
+      			      2. *
+      			      (3./4. * 2.*TMath::ATan(varValIn2->getVal()) / TMath::Pi() * val1ELo) / varValIn1->getErrorLo() *
+      			      varValOutELo / varValIn2->getErrorLo() *
+      			      (CovM != NULL && fitResult->floatParsFinal().index("FlS") != -1 && fitResult->floatParsFinal().index("AfbS") != -1 ?
+      			       (*CovM)(fitResult->floatParsFinal().index("FlS"),fitResult->floatParsFinal().index("AfbS")) : 0.) : 0.));
+
+      varValOutEHi = + sqrt( pow(3./4. * 2.*TMath::ATan(varValIn2->getVal()) / TMath::Pi() * val1EHi,2.) + pow(varValOutEHi,2.) +
+
+      			     (varValIn1->getErrorHi() != 0.0 && varValIn2->getErrorHi() != 0.0 ?
+      			      2. *
+      			      (3./4. * 2.*TMath::ATan(varValIn2->getVal()) / TMath::Pi() * val1EHi)  / varValIn1->getErrorHi() *
+      			      varValOutEHi / varValIn2->getErrorHi() *
+      			      (CovM != NULL && fitResult->floatParsFinal().index("FlS") != -1 && fitResult->floatParsFinal().index("AfbS") != -1 ?
+      			       (*CovM)(fitResult->floatParsFinal().index("FlS"),fitResult->floatParsFinal().index("AfbS")) : 0.) : 0.));
+
+      if (doIt == false)
+	{
+	  varValOut    = varValIn2->getVal();
+	  varValOutELo = varValIn2->getErrorLo();
+	  varValOutEHi = varValIn2->getErrorHi();
+	}
+    }
+  else if ((varName == "FsS") && (varValIn1 != NULL))
+    {
+      varValOut    = varValIn1->getVal();
+      varValOutELo = varValIn1->getErrorLo();
+      varValOutEHi = varValIn1->getErrorHi();
+    }
+  else if ((varName == "AsS") && (varValIn1 != NULL) && (varValIn2 != NULL) && (varValIn3 != NULL))
+    {
+      Transformer("FlS",doIt,val1,val1ELo,val1EHi,fitResult,varValIn1);
+      Transformer("FsS",doIt,val2,val2ELo,val2EHi,fitResult,varValIn2);
+
+      varValOut = varValIn3->getVal() * 2.*theorCoeff * sqrt(3. * val2 * (1. - val2) * val1);
+
+      varValOutELo = - sqrt( pow(2.*theorCoeff * sqrt(3. * val2 * (1. - val2) * val1) * varValIn3->getErrorLo(),2.) +
+			     pow(varValIn3->getVal() * 2.*theorCoeff * sqrt(3. * val2 * (1. - val2) / (4. * val1)) * varValIn1->getErrorLo(),2.) +
+			     pow(varValIn3->getVal() * 2.*theorCoeff * sqrt(3. * val1 / (4. * val2 * (1. - val2))) * (1. - 2.*val2) * varValIn2->getErrorLo(),2.));
+
+      varValOutEHi = + sqrt( pow(2.*theorCoeff * sqrt(3. * val2 * (1. - val2) * val1) * varValIn3->getErrorHi(),2.) +
+			     pow(varValIn3->getVal() * 2.*theorCoeff * sqrt(3. * val2 * (1. - val2) / (4. * val1)) * varValIn1->getErrorHi(),2.) +
+			     pow(varValIn3->getVal() * 2.*theorCoeff * sqrt(3. * val1 / (4. * val2 * (1. - val2))) * (1. - 2.*val2) * varValIn2->getErrorHi(),2.));
+    }
+  else if ((varName == "As5S") && (varValIn1 != NULL) && (varValIn2 != NULL) && (varValIn3 != NULL) && (varValIn4 != NULL))
+    {
+      Transformer("FlS",doIt,val1,val1ELo,val1EHi,fitResult,varValIn1);
+      Transformer("FsS",doIt,val2,val2ELo,val2EHi,fitResult,varValIn2);
+
+      varValOut = varValIn3->getVal() * theorCoeff * sqrt(3. * val2 * (1. - val2) * (1. - val1) * (1. + varValIn4->getVal()));
+
+      varValOutELo = - sqrt( pow(varValOut / varValIn3->getVal() * varValIn3->getErrorLo(),2.) +
+			     pow(varValOut / 2 * varValIn4->getErrorLo(),2.)/(1. + varValIn4->getVal()));
+			     
+      varValOutEHi = + sqrt( pow(varValOut / varValIn3->getVal() * varValIn3->getErrorHi(),2.) +
+                             pow(varValOut / 2 * varValIn4->getErrorHi(),2.)/(1. + varValIn4->getVal()));
+    }
+  else
+    {
+      std::cout << "[Utils::Transformer]\tWrong parameter: " << varName << std::endl;
+      exit (EXIT_FAILURE);
+    }
+
+
+  return "";
+}
+#endif

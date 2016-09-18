@@ -12,6 +12,9 @@
 #include <TGraphAsymmErrors.h>
 
 #if ROOFIT
+
+#include <RooDataHist.h>
+#include <RooAbsReal.h>
 #include <TH3.h>
 #include <TTree.h>
 #include <RooArgSet.h>
@@ -92,11 +95,7 @@ class Utils
                          double Py2,
                          double Pz2,
                          double mass2);
-
-  void  ComputeGenAngles(double &cosThetaKGen, 
-                         double &cosThetaMuGen, 
-                         double &phiKstMuMuPlaneGen);
-
+  
   double computeEta (double Px,
                      double Py,
                      double Pz);
@@ -191,6 +190,9 @@ class Utils
 
   void SaveFitValues (std::string fileName, std::vector<std::string>* vecParStr, int indx, std::string howOpen, std::string str = "");
 
+#if ROOFIT
+  std::string Transformer (std::string varName, bool doIt, double& varValOut, double& varValOutELo, double& varValOutEHi, RooFitResult* fitResult = NULL, RooRealVar* varValIn1 = NULL, RooRealVar* varValIn2 = NULL, RooRealVar* varValIn3 = NULL, RooRealVar* varValIn4 = NULL);
+#endif
 
   std::string MakeAnalysisPATH (std::string relativePath);
   unsigned int ParFileBlockN   (std::string blockName);
